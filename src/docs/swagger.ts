@@ -28,6 +28,16 @@ const doc = {
 				identifier: 'yourname',
 				password: 'yourpassword',
 			},
+			RegisterRequest: {
+				fullName: 'yourname',
+				username: 'yourusername',
+				email: 'youremail@mail.com',
+				password: 'yourpassword',
+				confirmPassword: 'yourConfirmpassword',
+			},
+			ActivationRequest: {
+				code: 'abcyznsqwe',
+			},
 		},
 	},
 };
