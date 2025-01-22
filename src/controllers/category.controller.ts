@@ -63,7 +63,7 @@ export default {
 			const result = await CategoryModel.findById(id);
 
 			if (!result) {
-				return response.error(res, null, 'Category not found');
+				return response.notfound(res, 'Category not found');
 			}
 
 			return response.success(res, result, 'Success find one category');
@@ -77,6 +77,10 @@ export default {
 			const result = await CategoryModel.findByIdAndUpdate(id, req.body, {
 				new: true,
 			});
+			if (!result) {
+				return response.notfound(res, 'Category not found');
+			}
+
 			return response.success(res, result, 'Success update category');
 		} catch (error) {
 			return response.error(res, error, 'Failed update category');
@@ -86,6 +90,10 @@ export default {
 		try {
 			const { id } = req.params;
 			const result = await CategoryModel.findByIdAndDelete(id);
+			if (!result) {
+				return response.notfound(res, 'Category not found');
+			}
+
 			return response.success(res, result, 'Success remove category');
 		} catch (error) {
 			return response.error(res, error, 'Failed remove category');

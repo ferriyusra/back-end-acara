@@ -17,6 +17,15 @@ export default {
 			data,
 		});
 	},
+	notfound(res: Response, message: string) {
+		res.status(404).json({
+			meta: {
+				status: 404,
+				message,
+			},
+			data: null,
+		});
+	},
 	error(res: Response, error: unknown, message: string) {
 		if (error instanceof Yup.ValidationError) {
 			return res.status(400).json({
