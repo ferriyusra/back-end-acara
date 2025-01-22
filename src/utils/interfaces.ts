@@ -19,3 +19,9 @@ export interface IUserToken
 	> {
 	id?: Types.ObjectId;
 }
+
+export interface IPaginationQuery {
+	page: number;
+	limit: number;
+	search: string;
+}
