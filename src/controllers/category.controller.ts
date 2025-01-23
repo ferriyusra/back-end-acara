@@ -89,7 +89,7 @@ export default {
 	async remove(req: IReqUser, res: Response) {
 		try {
 			const { id } = req.params;
-			const result = await CategoryModel.findByIdAndDelete(id);
+			const result = await CategoryModel.findByIdAndDelete(id, { new: true });
 			if (!result) {
 				return response.notfound(res, 'Category not found');
 			}
