@@ -56,7 +56,6 @@ export default {
 				'success find all events'
 			);
 		} catch (error) {
-			console.log('err ', error);
 			response.error(res, error, 'failed to find all events');
 		}
 	},
