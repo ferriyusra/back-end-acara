@@ -53,11 +53,23 @@ const doc = {
 				location: {
 					region: 'region id',
 					coordinates: [0, 0],
-					address: "",
+					address: '',
 				},
 				isOnline: false,
 				isFeatured: false,
-				isPublish: false
+				isPublish: false,
+			},
+			CreateTicketRequest: {
+				price: 0,
+				name: 'name',
+				events: 'event objectID',
+				description: 'ticket desc',
+				quantity: 5,
+			},
+			CreateBannerRequest: {
+				title: 'title',
+				image: 'fileUrl',
+				isShow: true,
 			},
 			RemoveMediaRequest: {
 				fileUrl: 'mediaURL',
