@@ -18,7 +18,7 @@ export default {
 			data,
 		});
 	},
-	notfound(res: Response, message: string) {
+	notfound(res: Response, message: string = 'not found') {
 		res.status(404).json({
 			meta: {
 				status: 404,
