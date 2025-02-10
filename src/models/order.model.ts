@@ -78,6 +78,7 @@ const OrderSchema = new Schema<Order>(
 			default: OrderStatus.PENDING,
 		},
 		ticket: {
+			type: Schema.Types.ObjectId,
 			ref: TICKET_MODEL_NAME,
 			required: true,
 		},
