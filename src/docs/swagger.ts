@@ -66,6 +66,11 @@ const doc = {
 				description: 'ticket desc',
 				quantity: 5,
 			},
+			CreateOrderRequest: {
+				events: 'event object id',
+				ticket: 'ticket object id',
+				quantity: 1,
+			},
 			CreateBannerRequest: {
 				title: 'title',
 				image: 'fileUrl',
