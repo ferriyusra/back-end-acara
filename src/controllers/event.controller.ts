@@ -3,6 +3,7 @@ import { IPaginationQuery, IReqUser } from '../utils/interfaces';
 import response from '../utils/response';
 import EventModel, { eventDTO, TypeEvent } from '../models/event.model';
 import { FilterQuery, isValidObjectId } from 'mongoose';
+import uploader from '../utils/uploader';
 
 export default {
 	async create(req: IReqUser, res: Response) {
@@ -18,6 +19,7 @@ export default {
 			response.error(res, error, 'failed create event');
 		}
 	},
+
 	async findAll(req: IReqUser, res: Response) {
 		try {
 			const buildQuery = (filter: any) => {
@@ -89,6 +91,7 @@ export default {
 			response.error(res, error, 'failed to find all events');
 		}
 	},
+
 	async findOne(req: IReqUser, res: Response) {
 		try {
 			const { id } = req.params;
@@ -98,7 +101,7 @@ export default {
 
 			const result = await EventModel.findById(id);
 			if (!result) {
-				response.notfound(res, 'event not found');
+				return response.notfound(res, 'event not found');
 			}
 
 			response.success(res, result, 'success find one event');
@@ -117,7 +120,7 @@ export default {
 				new: true,
 			});
 			if (!result) {
-				response.notfound(res, 'Event not found');
+				return response.notfound(res, 'event not found');
 			}
 
 			response.success(res, result, 'success update event');
@@ -136,8 +139,10 @@ export default {
 				new: true,
 			});
 			if (!result) {
-				response.notfound(res, 'Event not found');
+				return response.notfound(res, 'event not found');
 			}
+
+			await uploader.remove(result.banner);
 
 			response.success(res, result, 'success remove event');
 		} catch (error) {
@@ -150,7 +155,7 @@ export default {
 
 			const result = await EventModel.findOne({ slug });
 			if (!result) {
-				response.notfound(res, 'Event not found');
+				response.notfound(res, 'event not found');
 			}
 
 			response.success(res, result, 'success find one by slug event');
