@@ -1,72 +1,78 @@
 import { Request, Response } from 'express';
-import * as Yup from 'yup';
-import UserModel from '../models/user.model';
+import UserModel, {
+	userDTO,
+	userLoginDTO,
+	userUpdatePasswordDTO,
+} from '../models/user.model';
 import { encrypt } from '../utils/encryption';
 import { generateToken } from '../utils/jwt';
 import { IReqUser } from '../utils/interfaces';
 import response from '../utils/response';
 
-type TRegister = {
-	fullName: string;
-	username: string;
-	email: string;
-	password: string;
-	confirmPassword: string;
-};
-
-type TLogin = {
-	identifier: string;
-	password: string;
-};
-
-const registerValidateSchema = Yup.object({
-	fullName: Yup.string().required(),
-	username: Yup.string().required(),
-	email: Yup.string().email().required(),
-	password: Yup.string()
-		.required()
-		.min(6, 'Password must be at least 6 characters')
-		.test(
-			'at-least-one-uppercase-letter',
-			'Contains at least one uppercase letter',
-			(value) => {
-				if (!value) {
-					return false;
-				}
-
-				const regex = /^(?=.*[A-Z])/;
-
-				return regex.test(value);
-			}
-		)
-		.test('at-least-one-number', 'Contains at least one number', (value) => {
-			if (!value) {
-				return false;
-			}
-
-			const regex = /^(?=.*\d)/;
-
-			return regex.test(value);
-		}),
-	confirmPassword: Yup.string()
-		.required()
-		.oneOf([Yup.ref('password'), ''], "Password doesn't match"),
-});
-
 export default {
+	async updateProfile(req: IReqUser, res: Response) {
+		try {
+			const userId = req.user?.id;
+			const { fullName, profilePicture } = req.body;
+
+			const result = await UserModel.findByIdAndUpdate(
+				userId,
+				{
+					fullName,
+					profilePicture,
+				},
+				{
+					new: true,
+				}
+			);
+
+			if (!result) {
+				return response.notfound(res, 'user not found');
+			}
+
+			response.success(res, result, 'success to update profie');
+		} catch (error) {
+			response.error(res, error, 'failed to update profile');
+		}
+	},
+
+	async updatePassword(req: IReqUser, res: Response) {
+		try {
+			const userId = req.user?.id;
+			const { oldPassword, password, confirmPassword } = req.body;
+
+			await userUpdatePasswordDTO.validate({
+				oldPassword,
+				password,
+				confirmPassword,
+			});
+
+			const user = await UserModel.findById(userId);
+			if (!user || user.password !== encrypt(oldPassword)) {
+				return response.notfound(res, 'user not found');
+			}
+
+			const result = await UserModel.findByIdAndUpdate(
+				userId,
+				{
+					password: encrypt(password),
+				},
+				{
+					new: true,
+				}
+			);
+
+			response.success(res, result, 'success to update password');
+		} catch (error) {
+			response.error(res, error, 'failed to update password');
+		}
+	},
+
 	async register(req: Request, res: Response) {
-		/**
-		 #swagger.tags = ['Auth']
-		 #swagger.requestBody = {
-			 required: true,
-			 schema: {$ref: '#/components/schemas/RegisterRequest'}
-			 }
-		 */
-		const { fullName, username, email, password, confirmPassword } =
-			req.body as unknown as TRegister;
+		const { fullName, username, email, password, confirmPassword } = req.body;
 
 		try {
-			await registerValidateSchema.validate({
+			await userDTO.validate({
 				fullName,
 				username,
 				email,
@@ -88,16 +94,13 @@ export default {
 	},
 
 	async login(req: Request, res: Response) {
-		/**
-		 #swagger.tags = ['Auth']
-		 #swagger.requestBody = {
-		 required: true,
-		 schema: {$ref: "#/components/schemas/LoginRequest"}
-		 }
-		 */
-		const { identifier, password } = req.body as unknown as TLogin;
-
 		try {
+			const { identifier, password } = req.body;
+			await userLoginDTO.validate({
+				identifier,
+				password,
+			});
+
 			// ambil data user berdasarkkan "identifier" => email dan username
 			const userByIdentifier = await UserModel.findOne({
 				$or: [
@@ -134,12 +137,6 @@ export default {
 	},
 
 	async me(req: IReqUser, res: Response) {
-		/**
-		 #swagger.tags = ['Auth']
-		 #swagger.security = [{
-		 "bearerAuth": []
-		 }]
-		 */
 		try {
 			const user = req.user;
 
@@ -151,13 +148,6 @@ export default {
 	},
 
 	async activation(req: Request, res: Response) {
-		/**
-		 #swagger.tags = ['Auth']
-		 #swagger.requestBody = {
-			 required: true,
-			 schema: {$ref: '#/components/schemas/ActivationRequest'}
-			 }
-		 */
 		try {
 			const { code } = req.body as { code: string };
 
