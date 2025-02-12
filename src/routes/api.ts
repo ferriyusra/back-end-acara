@@ -111,6 +111,17 @@ router.post(
   */
 );
 router.get(
+	'/orders-history',
+	[authMiddleware, aclMiddleware([ROLES.MEMBER])],
+	orderController.findAllByMember
+	/*
+  #swagger.tags = ['Order']
+  #swagger.security = [{
+    "bearerAuth": ""
+  }]
+  */
+);
+router.get(
 	'/orders',
 	[authMiddleware, aclMiddleware([ROLES.ADMIN])],
 	orderController.findAll
